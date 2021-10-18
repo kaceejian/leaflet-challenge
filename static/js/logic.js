@@ -24,17 +24,44 @@ function draw(earthquakes) {
       accessToken: mapBoxKey,
     }
   ).addTo(myMap);
-
+  var depthMultiplier = 0.03;
   for (var earthquake of earthquakes) {
     //   draw a dot
     var circle = L.circle(
       [earthquake.geometry.coordinates[1], earthquake.geometry.coordinates[0]],
       {
-        color: "red",
-        fillColor: "#f03",
-        fillOpacity: 0.5,
-        radius: 5000 * earthquake.properties.mag,
+        color: "green",
+        fillColor: d3
+          .color("lightgreen")
+          .darker(earthquake.geometry.coordinates[2] * depthMultiplier)
+          .formatHex(),
+        fillOpacity: 1,
+        radius: 10000 * earthquake.properties.mag,
       }
     ).addTo(myMap);
   }
+  var legend = L.control({ position: "bottomright" });
+  legend.onAdd = function (Map) {
+    var div = L.DomUtil.create("div", "legend");
+    var legendColor = d3.color("lightgreen");
+    div.innerHTML += "<h4>Depth</h4>";
+    div.innerHTML += `<i style="background: ${legendColor.formatHex()}"></i><span>0</span><br>`;
+    div.innerHTML += `<i style="background: ${legendColor
+      .darker(10 * depthMultiplier)
+      .formatHex()}"></i><span>10</span><br>`;
+    div.innerHTML += `<i style="background: ${legendColor
+      .darker(30 * depthMultiplier)
+      .formatHex()}"></i><span>30</span><br>`;
+    div.innerHTML += `<i style="background: ${legendColor
+      .darker(50 * depthMultiplier)
+      .formatHex()}"></i><span>50</span><br>`;
+    div.innerHTML += `<i style="background: ${legendColor
+      .darker(70 * depthMultiplier)
+      .formatHex()}"></i><span>70</span><br>`;
+    div.innerHTML += `<i style="background: ${legendColor
+      .darker(90 * depthMultiplier)
+      .formatHex()}"></i><span>90+</span><br>`;
+    return div;
+  };
+  legend.addTo(myMap);
 }
